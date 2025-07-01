@@ -11,16 +11,31 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-                sh "docker build -t $IMAGE_NAME ."
+                bat "docker build -t %IMAGE_NAME% ."
             }
         }
 
         stage('Run Container') {
             steps {
                 echo 'Running Docker container...'
-                sh "docker rm -f $CONTAINER_NAME || true"
-                sh "docker run -d -p $PORT:$PORT --name $CONTAINER_NAME $IMAGE_NAME"
+                bat "docker rm -f %CONTAINER_NAME% || exit 0"
+                bat "docker run -d -p %PORT%:5000 --name %CONTAINER_NAME% %IMAGE_NAME%"
             }
+        }
+    }
+}
+stage('Push to DockerHub') {
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: 'dockerhub-creds',
+            usernameVariable: 'Mabasha',
+            passwordVariable: 'Chittu007'
+        )]) {
+            bat """
+                docker login -u %DOCKERHUB_USERNAME% -p %DOCKERHUB_PASSWORD%
+                docker tag flask-portfolio %DOCKERHUB_USERNAME%/flask-portfolio:latest
+                docker push %DOCKERHUB_USERNAME%/flask-portfolio:latest
+            """
         }
     }
 }
