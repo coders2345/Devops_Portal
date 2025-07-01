@@ -1,26 +1,25 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Clone') {
-            steps {
-                echo 'Cloning repository...'
-                git 'https://github.com/coders2345/Devops_Portal.git'
-            }
-        }
+    environment {
+        IMAGE_NAME = "flask-portfolio"
+        CONTAINER_NAME = "flask-portfolio"
+        PORT = "5000"
+    }
 
+    stages {
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-                sh 'docker build -t flask-portfolio .'
+                sh "docker build -t $IMAGE_NAME ."
             }
         }
 
         stage('Run Container') {
             steps {
-                echo 'Running container...'
-                sh 'docker rm -f flask-portfolio || true'
-                sh 'docker run -d -p 5000:5000 --name flask-portfolio flask-portfolio'
+                echo 'Running Docker container...'
+                sh "docker rm -f $CONTAINER_NAME || true"
+                sh "docker run -d -p $PORT:$PORT --name $CONTAINER_NAME $IMAGE_NAME"
             }
         }
     }
