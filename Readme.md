@@ -23,4 +23,31 @@ A personal portfolio web application built with Python Flask and deployed using 
 ---
 
 ## 📁 Project Structure
+Devops_Portal/
+├── app/
+│ └── routes.py, init.py
+├── templates/
+│ └── index.html, about.html, etc.
+├── static/
+│ └── style.css
+├── run.py
+├── Dockerfile
+├── Jenkinsfile
+├── render.yaml
+
+yaml
+Copy
+Edit
+
+---
+
+## 🐳 Docker Commands (Manual)
+
+```bash
+# Build Docker Image
+docker build -t flask-portfolio .
+
+# Run Container
+docker run -d -p 5000:5000 flask-portfolio
+
 
