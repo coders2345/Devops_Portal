@@ -11,66 +11,40 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo ' Building Docker image...'
+                echo '📦 Building Docker image...'
                 bat "docker build -t %IMAGE_NAME% ."
             }
         }
 
         stage('Run Container for Test') {
             steps {
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-                echo ' Running Docker container (temp for testing)...'
-                bat "docker rm -f temp-test || exit 0"
-                bat "docker run -d -p %PORT%:5000 --name temp-test %IMAGE_NAME%"
-                bat "timeout /T 5" // Wait for Flask to start
-=======
                 echo '🚀 Running Docker container (temp for testing)...'
-=======
-                echo 'Running Docker container (temp for testing)...'
->>>>>>> Stashed changes
                 bat "docker rm -f temp-test || exit 0"
+                bat "docker rm -f %CONTAINER_NAME% || exit 0"
                 bat "docker run -d -p %PORT%:5000 --name temp-test %IMAGE_NAME%"
-                 bat "ping 127.0.0.1 -n 6 > nul"
->>>>>>> 725037d ("adding jenkins file")
+                bat "ping 127.0.0.1 -n 6 > nul"  // Wait for app to initialize
             }
         }
 
         stage('Test Application') {
             steps {
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-                echo ' Performing health check...'
-=======
                 echo '🧪 Performing health check...'
->>>>>>> 725037d ("adding jenkins file")
-=======
-                echo ' Performing health check...'
->>>>>>> Stashed changes
                 bat 'curl -s http://localhost:5000 | findstr "Portfolio" || exit /b 1'
             }
         }
 
         stage('Clean Up Test Container') {
             steps {
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-                echo 'Cleaning up test container...'
-=======
                 echo '🧹 Cleaning up test container...'
->>>>>>> 725037d ("adding jenkins file")
-=======
-                echo ' Cleaning up test container...'
->>>>>>> Stashed changes
                 bat "docker rm -f temp-test"
             }
         }
 
         stage('Push to DockerHub') {
             steps {
-                echo '☁Pushing image to DockerHub...'
+                echo '☁️ Pushing image to DockerHub...'
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
+                    credentialsId: 'dockerhub-creds', // Stored securely in Jenkins
                     usernameVariable: 'DOCKERHUB_USERNAME',
                     passwordVariable: 'DOCKERHUB_PASSWORD'
                 )]) {
