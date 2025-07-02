@@ -22,14 +22,14 @@ pipeline {
                 bat "docker rm -f temp-test || exit 0"
                 bat "docker rm -f %CONTAINER_NAME% || exit 0"
                 bat "docker run -d -p %PORT%:5000 --name temp-test %IMAGE_NAME%"
-                bat "ping 127.0.0.1 -n 6 > nul"
+                bat "ping 127.0.0.1 -n 6 > nul"  // Wait for app to initialize
             }
         }
 
         stage('Test Application') {
             steps {
                 echo 'Performing health check...'
-                bat 'curl -s http://localhost:5000 | findstr "Portfolio" || exit /b 1'
+                bat 'curl -s -o nul -w "%%{http_code}" http://localhost:5000 | findstr "200" || exit /b 1'
             }
         }
 
@@ -42,9 +42,9 @@ pipeline {
 
         stage('Push to DockerHub') {
             steps {
-                echo 'Pushing image to DockerHub...'
+                echo '☁️ Pushing image to DockerHub...'
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
+                    credentialsId: 'dockerhub-creds', // Stored securely in Jenkins
                     usernameVariable: 'DOCKERHUB_USERNAME',
                     passwordVariable: 'DOCKERHUB_PASSWORD'
                 )]) {
@@ -53,15 +53,6 @@ pipeline {
                         docker tag %IMAGE_NAME% %DOCKERHUB_USERNAME%/%IMAGE_NAME%:latest
                         docker push %DOCKERHUB_USERNAME%/%IMAGE_NAME%:latest
                     """
-                }
-            }
-        }
-
-        stage('Deploy to Render') {
-            steps {
-                echo 'Triggering deployment to Render...'
-                withCredentials([string(credentialsId: 'RENDER_DEPLOY_HOOK', variable: 'RENDER_HOOK')]) {
-                    bat "curl -X POST %RENDER_HOOK%"
                 }
             }
         }
