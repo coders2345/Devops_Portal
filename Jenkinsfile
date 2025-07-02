@@ -11,24 +11,39 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo '📦 Building Docker image...'
+                echo ' Building Docker image...'
                 bat "docker build -t %IMAGE_NAME% ."
             }
         }
 
-        stage('Run Container') {
+        stage('Run Container for Test') {
             steps {
-                echo '🚀 Running Docker container...'
-                bat "docker rm -f %CONTAINER_NAME% || exit 0"
-                bat "docker run -d -p %PORT%:5000 --name %CONTAINER_NAME% %IMAGE_NAME%"
+                echo ' Running Docker container (temp for testing)...'
+                bat "docker rm -f temp-test || exit 0"
+                bat "docker run -d -p %PORT%:5000 --name temp-test %IMAGE_NAME%"
+                bat "timeout /T 5" // Wait for Flask to start
+            }
+        }
+
+        stage('Test Application') {
+            steps {
+                echo ' Performing health check...'
+                bat 'curl -s http://localhost:5000 | findstr "Portfolio" || exit /b 1'
+            }
+        }
+
+        stage('Clean Up Test Container') {
+            steps {
+                echo 'Cleaning up test container...'
+                bat "docker rm -f temp-test"
             }
         }
 
         stage('Push to DockerHub') {
             steps {
-                echo '☁️ Pushing image to DockerHub...'
+                echo '☁Pushing image to DockerHub...'
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds', // This should be set in Jenkins Credentials
+                    credentialsId: 'dockerhub-creds',
                     usernameVariable: 'DOCKERHUB_USERNAME',
                     passwordVariable: 'DOCKERHUB_PASSWORD'
                 )]) {
