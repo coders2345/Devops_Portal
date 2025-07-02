@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: flask-portfolio
+    env: docker
+    plan: free
+    repo: https://github.com/coders2345/Devops_Portal
+    branch: main
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
