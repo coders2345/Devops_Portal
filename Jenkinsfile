@@ -18,6 +18,7 @@ pipeline {
 
         stage('Run Container for Test') {
             steps {
+<<<<<<< Updated upstream
 <<<<<<< HEAD
                 echo ' Running Docker container (temp for testing)...'
                 bat "docker rm -f temp-test || exit 0"
@@ -25,6 +26,9 @@ pipeline {
                 bat "timeout /T 5" // Wait for Flask to start
 =======
                 echo '🚀 Running Docker container (temp for testing)...'
+=======
+                echo 'Running Docker container (temp for testing)...'
+>>>>>>> Stashed changes
                 bat "docker rm -f temp-test || exit 0"
                 bat "docker run -d -p %PORT%:5000 --name temp-test %IMAGE_NAME%"
                  bat "ping 127.0.0.1 -n 6 > nul"
@@ -34,22 +38,30 @@ pipeline {
 
         stage('Test Application') {
             steps {
+<<<<<<< Updated upstream
 <<<<<<< HEAD
                 echo ' Performing health check...'
 =======
                 echo '🧪 Performing health check...'
 >>>>>>> 725037d ("adding jenkins file")
+=======
+                echo ' Performing health check...'
+>>>>>>> Stashed changes
                 bat 'curl -s http://localhost:5000 | findstr "Portfolio" || exit /b 1'
             }
         }
 
         stage('Clean Up Test Container') {
             steps {
+<<<<<<< Updated upstream
 <<<<<<< HEAD
                 echo 'Cleaning up test container...'
 =======
                 echo '🧹 Cleaning up test container...'
 >>>>>>> 725037d ("adding jenkins file")
+=======
+                echo ' Cleaning up test container...'
+>>>>>>> Stashed changes
                 bat "docker rm -f temp-test"
             }
         }
