@@ -11,14 +11,14 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo '📦 Building Docker image...'
+                echo 'Building Docker image...'
                 bat "docker build -t %IMAGE_NAME% ."
             }
         }
 
         stage('Run Container for Test') {
             steps {
-                echo '🚀 Running Docker container (temp for testing)...'
+                echo 'Running Docker container (temp for testing)...'
                 bat "docker rm -f temp-test || exit 0"
                 bat "docker rm -f %CONTAINER_NAME% || exit 0"
                 bat "docker run -d -p %PORT%:5000 --name temp-test %IMAGE_NAME%"
@@ -28,14 +28,14 @@ pipeline {
 
         stage('Test Application') {
             steps {
-                echo '🧪 Performing health check...'
-                bat 'curl -s http://localhost:5000 | findstr "Portfolio" || exit /b 1'
+                echo 'Performing health check...'
+                bat 'curl -s -o nul -w "%%{http_code}" http://localhost:5000 | findstr "200" || exit /b 1'
             }
         }
 
         stage('Clean Up Test Container') {
             steps {
-                echo '🧹 Cleaning up test container...'
+                echo 'Cleaning up test container...'
                 bat "docker rm -f temp-test"
             }
         }
